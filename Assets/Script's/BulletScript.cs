@@ -2,27 +2,36 @@ using UnityEngine;
 
 public class BulletScript : MonoBehaviour
 {
-    private Vector3 mousePos;
-    private Camera mainCam;
-    private Rigidbody2D rb;
-
     public float force = 10f;
+    public int damage = 1;
+    public float lifetime = 3f;
 
-    void Start()
+    private Vector2 direction;
+    private bool directionSet = false;
+
+    
+    public void SetDirection(Vector2 dir)
     {
-        mainCam = Camera.main;
-        rb = GetComponent<Rigidbody2D>();
+        direction = dir.normalized;
+        directionSet = true;
 
-        // Get correct mouse world position
-        Vector3 mouseScreenPos = Input.mousePosition;
-        mouseScreenPos.z = Mathf.Abs(mainCam.transform.position.z);
+        
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 180f;
+        transform.rotation = Quaternion.Euler(0f, 0f, angle);
 
-        mousePos = mainCam.ScreenToWorldPoint(mouseScreenPos);
+        Destroy(gameObject, lifetime);
+    }
 
-        // Calculate direction
-        Vector3 direction = mousePos - transform.position;
+    void Update()
+    {
+        if (!directionSet) return;
+        transform.Translate(direction * force * Time.deltaTime, Space.World);
+    }
 
-        // Apply velocity
-        rb.linearVelocity = new Vector2(direction.x, direction.y).normalized * force;
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player") || other.CompareTag("Bullet")) return;
+        if (!other.CompareTag("Enemy"))
+            Destroy(gameObject);
     }
 }
