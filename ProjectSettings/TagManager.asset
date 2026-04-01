@@ -2,16 +2,11 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-<<<<<<< Updated upstream
-  serializedVersion: 2
-  tags: []
-=======
   serializedVersion: 3
   tags:
   - Enemy
   - XP
   - Bullet
->>>>>>> Stashed changes
   layers:
   - Default
   - TransparentFX
@@ -49,3 +44,32 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: background 1
+    uniqueID: 880349229
+    locked: 0
+  - name: background 2
+    uniqueID: 515989569
+    locked: 0
+  - name: bg 3
+    uniqueID: 1522895839
+    locked: 0
+  - name: 4
+    uniqueID: 387895345
+    locked: 0
+  - name: 5
+    uniqueID: 1052680647
+    locked: 0
+  - name: 6
+    uniqueID: 95426913
+    locked: 0
+  - name: 7
+    uniqueID: 741164551
+    locked: 0
+  - name: Player
+    uniqueID: 344967161
+    locked: 0
+  - name: UI
+    uniqueID: 3437868973
+    locked: 0
+  m_RenderingLayers:
+  - Default
