@@ -5,8 +5,8 @@ public class Shooting : MonoBehaviour
     private Camera mainCam;
     private Vector3 mousePos;
 
-    public GameObject bullet;
     public Transform bulletTransform;
+    public Transform rotatePoint;
     public float timeBetweenFiring = 0.2f;
 
     private bool canFire = true;
@@ -24,13 +24,12 @@ public class Shooting : MonoBehaviour
 
         mousePos = mainCam.ScreenToWorldPoint(mouseScreenPos);
 
-        Vector2 direction = mousePos - transform.position;
+        Vector2 direction = mousePos - rotatePoint.position;
 
         float rotZ = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
-        transform.rotation = Quaternion.Euler(0, 0, rotZ - 185f); // tweak if needed
+        rotatePoint.rotation = Quaternion.Euler(0, 0, rotZ - 185f);
 
-        // Fire rate logic
         if (!canFire)
         {
             timer += Time.deltaTime;
@@ -41,11 +40,10 @@ public class Shooting : MonoBehaviour
             }
         }
 
-        // Shooting
         if (Input.GetMouseButton(0) && canFire)
         {
             canFire = false;
-            Instantiate(bullet, bulletTransform.position, bulletTransform.rotation);
+            BulletPool.Instance.Get(bulletTransform.position, bulletTransform.rotation);
         }
     }
 }

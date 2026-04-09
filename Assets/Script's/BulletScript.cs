@@ -2,27 +2,44 @@ using UnityEngine;
 
 public class BulletScript : MonoBehaviour
 {
-    private Vector3 mousePos;
     private Camera mainCam;
     private Rigidbody2D rb;
 
     public float force = 10f;
+    public float lifetime = 3f;
+    private float timer;
 
-    void Start()
+    private void Awake()
     {
         mainCam = Camera.main;
         rb = GetComponent<Rigidbody2D>();
+    }
 
-        // Get correct mouse world position
+    private void OnEnable()
+    {
+        // Reset lifetime timer each time bullet is reused
+        timer = 0f;
+
         Vector3 mouseScreenPos = Input.mousePosition;
         mouseScreenPos.z = Mathf.Abs(mainCam.transform.position.z);
 
-        mousePos = mainCam.ScreenToWorldPoint(mouseScreenPos);
-
-        // Calculate direction
+        Vector3 mousePos = mainCam.ScreenToWorldPoint(mouseScreenPos);
         Vector3 direction = mousePos - transform.position;
 
-        // Apply velocity
         rb.linearVelocity = new Vector2(direction.x, direction.y).normalized * force;
+    }
+
+    private void Update()
+    {
+        // Return to pool after lifetime instead of Destroy
+        timer += Time.deltaTime;
+        if (timer >= lifetime)
+            BulletPool.Instance.ReturnToPool(gameObject);
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        // Return to pool on hit instead of Destroy
+        BulletPool.Instance.ReturnToPool(gameObject);
     }
 }
