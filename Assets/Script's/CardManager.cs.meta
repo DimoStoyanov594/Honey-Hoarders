@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6d447a0e5dcce144293db2105e8de37f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - cardSelectionPanel: {instanceID: 0}
+  - overlayImage: {instanceID: 0}
+  - companionPrefab: {instanceID: 0}
+  - player: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
