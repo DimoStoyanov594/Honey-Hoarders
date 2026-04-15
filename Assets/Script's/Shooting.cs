@@ -3,12 +3,10 @@ using UnityEngine;
 public class Shooting : MonoBehaviour
 {
     private Camera mainCam;
-
-    [Tooltip("Drag the bullet PREFAB from your Project panel here — NOT from the Hierarchy")]
     public GameObject bulletPrefab;
     public Transform firePoint;        
     public float timeBetweenFiring = 0.2f;
-
+    public int bulletDamage = 1;
     private float timer = 0f;
 
     void Start()
@@ -40,6 +38,7 @@ public class Shooting : MonoBehaviour
     {
         if (bulletPrefab == null)
         {
+            Debug.Log("Shooting bullet with damage: " + bulletDamage);
             Debug.LogError("Shooting: bulletPrefab is not assigned! Drag the bullet prefab from your Project panel.");
             return;
         }
@@ -49,6 +48,9 @@ public class Shooting : MonoBehaviour
   
         BulletScript bs = b.GetComponent<BulletScript>();
         if (bs != null)
+        {
+            bs.SetDamage(bulletDamage);
             bs.SetDirection((mousePos - firePoint.position).normalized);
+        }
     }
 }

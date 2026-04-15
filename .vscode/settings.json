@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "ai and backgriund branch.slnx"
+    "dotnet.defaultSolution": "Honey-Hoarders.slnx"
 }

@@ -12,6 +12,8 @@ public class EXPManager : MonoBehaviour
     public Slider expSlider;
     public TMP_Text currentLevelText;
 
+    [SerializeField] private CardManager cardManager;
+
     private void Start()
     {
         UpdateUI();
@@ -42,12 +44,28 @@ public class EXPManager : MonoBehaviour
         level++;
         currentExp -= expToLevel;
         expToLevel = Mathf.RoundToInt(expToLevel * epxGrowthMultiplier);
+
+        if (cardManager != null)
+        {
+            cardManager.OnLevelUp();
+        }
+        else
+        {
+            Debug.LogError("CardManager reference is missing in EXPManager.");
+        }
     }
 
     public void UpdateUI()
     {
-        expSlider.maxValue = expToLevel;
-        expSlider.value = currentExp;
-        currentLevelText.text = "Level: " + level;
+        if (expSlider != null)
+        {
+            expSlider.maxValue = expToLevel;
+            expSlider.value = currentExp;
+        }
+
+        if (currentLevelText != null)
+        {
+            currentLevelText.text = "Level: " + level;
+        }
     }
 }

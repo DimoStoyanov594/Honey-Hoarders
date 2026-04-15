@@ -106,7 +106,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9176547392fe2e43adcb1370ded7bdb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletScript
-  force: 10
+  force: 8
   damage: 1
   lifetime: 3
 --- !u!70 &7182771914626387876

@@ -7,6 +7,8 @@ TagManager:
   - Enemy
   - XP
   - Bullet
+  - EnemyBullet
+  - CompanionBullet
   layers:
   - Default
   - TransparentFX
@@ -70,6 +72,9 @@ TagManager:
     locked: 0
   - name: UI
     uniqueID: 3437868973
+    locked: 0
+  - name: UI 2
+    uniqueID: 189022551
     locked: 0
   m_RenderingLayers:
   - Default
