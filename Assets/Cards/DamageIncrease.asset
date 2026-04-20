@@ -16,4 +16,5 @@ MonoBehaviour:
   description: Enhances the damage of the stinger
   artwork: {fileID: 0}
   effectType: 1
-  value: 5
+  value: 1
+  isUnique: 0

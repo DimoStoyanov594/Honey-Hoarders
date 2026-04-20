@@ -31,23 +31,22 @@ public class EnemyBulletScript : MonoBehaviour
         transform.rotation = Quaternion.Euler(180f, 180f, angle);
     }
 
-    void OnTriggerEnter2D(Collider2D collision)
+     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (collision.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            HealthManager hm = collision.GetComponent<HealthManager>();
-            if (hm != null)
-            {
-                hm.TakeDamage(damage);
-                Animator anim = collision.GetComponent<Animator>();
-                if (anim != null) anim.SetTrigger("Hurt");
-            }
+            PlayerController player = other.GetComponentInParent<PlayerController>();
+            if (player != null)
+                player.TakePlayerDamage(damage);
+
             Destroy(gameObject);
+            return;
         }
+
 
         // Destroy on hitting anything tagged as ground / wall / obstacle
         // Add more tags below if needed
-        if (collision.CompareTag("Bullet") || collision.CompareTag("Player"))
+        if (other.CompareTag("Bullet"))
         {
             Destroy(gameObject);
         }

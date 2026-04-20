@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
+    [Header("UI")]
+    [SerializeField] private WaveTextUI waveTextUI;
+    
     [Header("References")]
     public GameObject enemyType1Prefab;
     public GameObject enemyType2Prefab;
@@ -9,52 +12,118 @@ public class EnemySpawner : MonoBehaviour
 
     [Header("Spawning")]
     public float spawnRadius = 10f;
-    public float spawnInterval = 2f;
-    public int enemiesPerWave = 1;
+    public float spawnInterval = 1f;
+
+    [Header("Wave Settings")]
+    public int startingEnemies = 15;
+    public int enemiesIncreasePerWave = 5;
 
     [Header("Spawn Chances")]
     [Range(0f, 1f)] public float enemyType1Chance = 0.75f;
     [Range(0f, 1f)] public float enemyType2Chance = 0.25f;
 
+    [Header("Wave Timing")]
+    public float timeBetweenWaves = 5f;
+
+    private bool waitingForNextWave = false;
+    private float waveTimer = 0f;
+
     private float timer = 0f;
+
+    private int currentWave = 1;
+    private int enemiesToSpawnThisWave;
+    private int enemiesSpawnedThisWave;
+    private int enemiesAlive;
+
+    private bool waveInProgress = false;
+
+    
+
+    void Start()
+    {
+        StartWave();
+    }
 
     void Update()
     {
+        if (player == null) return;
+
+        // Waiting phase between waves
+        if (waitingForNextWave)
+        {
+            waveTimer -= Time.deltaTime;
+
+            if (waveTimer <= 0f)
+            {
+                currentWave++;
+                StartWave();
+                waitingForNextWave = false;
+            }
+
+            return;
+        }
+
+        if (!waveInProgress) return;
+
         timer += Time.deltaTime;
 
-        if (timer >= spawnInterval)
+        // Spawn enemies one by one during the wave
+        if (enemiesSpawnedThisWave < enemiesToSpawnThisWave && timer >= spawnInterval)
         {
             timer = 0f;
-            SpawnEnemies();
+            SpawnSingleEnemy();
+        }
+
+        // If all enemies for this wave were spawned and all are dead, start break
+        if (enemiesSpawnedThisWave >= enemiesToSpawnThisWave && enemiesAlive <= 0)
+        {
+            waveInProgress = false;
+            waitingForNextWave = true;
+            waveTimer = timeBetweenWaves;
         }
     }
 
-    void SpawnEnemies()
+    void StartWave()
     {
-        for (int i = 0; i < enemiesPerWave; i++)
+        enemiesToSpawnThisWave = startingEnemies + (currentWave - 1) * enemiesIncreasePerWave;
+        enemiesSpawnedThisWave = 0;
+        enemiesAlive = 0;
+        timer = 0f;
+        waveInProgress = true;
+
+        if (waveTextUI != null)
+            waveTextUI.ShowWave(currentWave);
+
+    }
+
+    void SpawnSingleEnemy()
+    {
+        float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
+
+        Vector2 spawnPos = new Vector2(
+            player.transform.position.x + Mathf.Cos(angle) * spawnRadius,
+            player.transform.position.y + Mathf.Sin(angle) * spawnRadius
+        );
+
+        GameObject chosenPrefab = GetRandomEnemyPrefab();
+        GameObject enemy = Instantiate(chosenPrefab, spawnPos, Quaternion.identity);
+
+        EnemyAI normalAI = enemy.GetComponent<EnemyAI>();
+        if (normalAI != null)
         {
-            float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
-
-            Vector2 spawnPos = new Vector2(
-                player.transform.position.x + Mathf.Cos(angle) * spawnRadius,
-                player.transform.position.y + Mathf.Sin(angle) * spawnRadius
-            );
-
-            GameObject chosenPrefab = GetRandomEnemyPrefab();
-            GameObject enemy = Instantiate(chosenPrefab, spawnPos, Quaternion.identity);
-
-            EnemyAI normalAI = enemy.GetComponent<EnemyAI>();
-            if (normalAI != null)
-            {
-                normalAI.player = player;
-            }
-
-            ShootingEnemyAI shootingAI = enemy.GetComponent<ShootingEnemyAI>();
-            if (shootingAI != null)
-            {
-                shootingAI.player = player;
-            }
+            normalAI.player = player;
+            normalAI.spawner = this;
         }
+
+        ShootingEnemyAI shootingAI = enemy.GetComponent<ShootingEnemyAI>();
+        if (shootingAI != null)
+        {
+            shootingAI.player = player;
+            shootingAI.spawner = this;
+        }
+
+        enemiesSpawnedThisWave++;
+        enemiesAlive++;
     }
 
     GameObject GetRandomEnemyPrefab()
@@ -66,5 +135,10 @@ public class EnemySpawner : MonoBehaviour
             return enemyType1Prefab;
         else
             return enemyType2Prefab;
+    }
+
+    public void OnEnemyKilled()
+    {
+        enemiesAlive--;
     }
 }

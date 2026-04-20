@@ -13,7 +13,6 @@ public class BulletScript : MonoBehaviour
    public void SetDamage(int dmg)
    {
         damage = dmg;
-        Debug.Log("Bullet damage set to: " + damage);
     }
 
     public int GetDamage()

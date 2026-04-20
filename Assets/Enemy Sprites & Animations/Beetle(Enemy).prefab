@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 1036213004266825960}
   - component: {fileID: 5530722436110370153}
   - component: {fileID: -8580360356028446146}
-  - component: {fileID: 1220837348179739832}
   - component: {fileID: 1084257960600963175}
   - component: {fileID: 5671066120440384602}
   - component: {fileID: 8505724298462653643}
+  - component: {fileID: 2361725594780679490}
   m_Layer: 0
   m_Name: Beetle(Enemy)
   m_TagString: Enemy
@@ -32,8 +32,8 @@ Transform:
   m_GameObject: {fileID: 3979602994439377032}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 9.627053, y: 9.627053, z: 9.627053}
+  m_LocalPosition: {x: -90.2979, y: -66.5352, z: 0}
+  m_LocalScale: {x: 0.122476324, y: 0.122476324, z: 0.122476324}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -135,43 +135,6 @@ Animation:
   m_AnimatePhysics: 0
   m_UpdateMode: 0
   m_CullingType: 0
---- !u!70 &1220837348179739832
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3979602994439377032}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.19, y: 0.14}
-  m_Direction: 0
 --- !u!114 &1084257960600963175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -214,7 +177,7 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 150
   DopplerLevel: 1
-  MinDistance: 0.5
+  MinDistance: 1.2166595
   MaxDistance: 2.4226136
   Pan2D: 0
   rolloffMode: 0
@@ -305,3 +268,40 @@ MonoBehaviour:
   audioSource: {fileID: 5671066120440384602}
   player: {fileID: 0}
   maxDistance: 17
+--- !u!70 &2361725594780679490
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3979602994439377032}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0.31712875, y: 0.22858389}
+  m_Size: {x: 20.375994, y: 20.375994}
+  m_Direction: 0

@@ -2,55 +2,138 @@ using UnityEngine;
 
 public class Shooting : MonoBehaviour
 {
-    private Camera mainCam;
-    public GameObject bulletPrefab;
-    public Transform firePoint;        
-    public float timeBetweenFiring = 0.2f;
-    public int bulletDamage = 1;
-    private float timer = 0f;
+    [Header("References")]
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private Transform aimPivot;
+    [SerializeField] private Transform player;
 
-    void Start()
+    [Header("Shooting")]
+    [SerializeField] private float timeBetweenFiring = 0.2f;
+    [SerializeField] private int bulletDamage = 1;
+    [SerializeField] private float rotationOffset = -185f;
+
+    private Camera mainCam;
+    private float timer;
+
+    private void Start()
     {
         mainCam = Camera.main;
+
+        if (player == null)
+            player = transform.root;
     }
 
-    void Update()
+    private void Update()
     {
+        if (mainCam == null)
+            mainCam = Camera.main;
+
         timer += Time.deltaTime;
+
+        UpdateAim();
+        HandleShooting();
+    }
+
+    private void UpdateAim()
+    {
+        if (mainCam == null)
+            return;
+
+        Transform rotationTarget = aimPivot != null ? aimPivot : transform;
+
+        // If a stable player/root exists, keep the pivot attached to it.
+        // This helps if the visible skin changes but the gameplay pivot stays.
+        if (aimPivot != null && player != null)
+            aimPivot.position = player.position;
 
         Vector3 mouseScreenPos = Input.mousePosition;
         mouseScreenPos.z = Mathf.Abs(mainCam.transform.position.z);
-        Vector3 mousePos = mainCam.ScreenToWorldPoint(mouseScreenPos);
+        Vector3 mouseWorldPos = mainCam.ScreenToWorldPoint(mouseScreenPos);
 
-        Vector2 direction = mousePos - transform.position;
+        Vector2 direction = mouseWorldPos - rotationTarget.position;
+
+        if (direction.sqrMagnitude <= 0.0001f)
+            return;
+
         float rotZ = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0f, 0f, rotZ - 185f);
+        rotationTarget.rotation = Quaternion.Euler(0f, 0f, rotZ + rotationOffset);
+    }
 
-
+    private void HandleShooting()
+    {
         if (Input.GetMouseButton(0) && timer >= timeBetweenFiring)
         {
             timer = 0f;
-            Shoot(mousePos);
+            Shoot();
         }
     }
 
-    void Shoot(Vector3 mousePos)
+    private void Shoot()
     {
         if (bulletPrefab == null)
         {
-            Debug.Log("Shooting bullet with damage: " + bulletDamage);
-            Debug.LogError("Shooting: bulletPrefab is not assigned! Drag the bullet prefab from your Project panel.");
             return;
         }
 
-        GameObject b = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+        if (firePoint == null)
+        {
+            return;
+        }
 
-  
-        BulletScript bs = b.GetComponent<BulletScript>();
+        if (mainCam == null)
+        {
+            return;
+        }
+
+        Vector3 mouseScreenPos = Input.mousePosition;
+        mouseScreenPos.z = Mathf.Abs(mainCam.transform.position.z);
+        Vector3 mouseWorldPos = mainCam.ScreenToWorldPoint(mouseScreenPos);
+
+        Vector2 bulletDirection = (mouseWorldPos - firePoint.position).normalized;
+
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+
+        BulletScript bs = bullet.GetComponent<BulletScript>();
         if (bs != null)
         {
             bs.SetDamage(bulletDamage);
-            bs.SetDirection((mousePos - firePoint.position).normalized);
+            bs.SetDirection(bulletDirection);
         }
+    }
+
+    public void SetBulletDamage(int newDamage)
+    {
+        bulletDamage = newDamage;
+    }
+
+    public int GetBulletDamage()
+    {
+        return bulletDamage;
+    }
+
+    public float GetTimeBetweenFiring()
+    {
+        return timeBetweenFiring;
+    }
+
+    public void SetTimeBetweenFiring(float newTimeBetweenFiring)
+    {
+        timeBetweenFiring = Mathf.Max(0.05f, newTimeBetweenFiring);
+    }
+
+    public void SetFirePoint(Transform newFirePoint)
+    {
+        firePoint = newFirePoint;
+    }
+
+    public void SetAimPivot(Transform newAimPivot)
+    {
+        aimPivot = newAimPivot;
+    }
+
+    public void SetPlayer(Transform newPlayer)
+    {
+        player = newPlayer;
     }
 }

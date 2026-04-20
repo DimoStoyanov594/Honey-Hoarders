@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3eca5d7b8f073344ea80d16bf03380e9, type: 3}
+  m_Name: New Character Database
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterDatabase
+  character:
+  - characterName: Bee
+    characterSprite: {fileID: -4656658513182322354, guid: af82457d0683caa45af771d7c8bd21fb, type: 3}
+    animatorController: {fileID: 9100000, guid: 409c26461b63a9445b2b00b3fe877d96, type: 2}
+    scale: {x: 1, y: 1, z: 1}
+  - characterName: Queen Bee
+    characterSprite: {fileID: -3796587054539071613, guid: d14747c730c930e4ebb2ddd1a9d1d095, type: 3}
+    animatorController: {fileID: 9100000, guid: 520a01d4819229146a95aba9afb80b5c, type: 2}
+    scale: {x: 0.03688752, y: 0.03688752, z: 0.03688752}
+  - characterName: Invincibee
+    characterSprite: {fileID: -4330204763214339160, guid: 614d4917212216b40ba1765bc7e8821a, type: 3}
+    animatorController: {fileID: 9100000, guid: 5742b82ecb2a9694ba6a22ab4cc3d8ea, type: 2}
+    scale: {x: 0.1066667, y: 0.1066667, z: 1}
+  - characterName: Geoffrey
+    characterSprite: {fileID: -1679692885769246964, guid: ad6b4b412d0199e4f9e9c32f64fd42a2, type: 3}
+    animatorController: {fileID: 9100000, guid: 2f9e75fac9054c9489699457eb9de56c, type: 2}
+    scale: {x: 0.1066667, y: 0.1066667, z: 1}
+  - characterName: Robot
+    characterSprite: {fileID: -1002163470196486544, guid: 53e5816be5a4e1140810b5803158a83d, type: 3}
+    animatorController: {fileID: 9100000, guid: 5460ce1d913acb04fa11cab0ed9a3882, type: 2}
+    scale: {x: 0.0966667, y: 0.0966667, z: 1}
+  - characterName: God of Honey
+    characterSprite: {fileID: 880906846434851621, guid: cd5cf9ab050131d4798b5691b60265e5, type: 3}
+    animatorController: {fileID: 9100000, guid: cfa67aee3620cc549a1a66d3338b40b1, type: 2}
+    scale: {x: 0.0966667, y: 0.0966667, z: 1}

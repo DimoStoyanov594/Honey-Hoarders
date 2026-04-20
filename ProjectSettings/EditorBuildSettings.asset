@@ -8,6 +8,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Main.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/Main_Menu.unity
+    guid: 736003aa1547f6c4ba583c1648f7d64a
+  - enabled: 1
+    path: Assets/Scenes/Skin_Select.unity
+    guid: 46a67bd4858ccbc438d66a1ef2297adb
+  - enabled: 1
+    path: Assets/Scenes/Game-Scene.unity
+    guid: 658359f13336b4c4897f365a2c374c8b
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 3590b91b4603b465dbb4216d601bff33, type: 3}
   m_UseUCBPForAssetBundles: 0

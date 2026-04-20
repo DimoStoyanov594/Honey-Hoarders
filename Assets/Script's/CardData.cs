@@ -18,4 +18,5 @@ public enum CardEffectType
     IncreaseSpeed,
     ReduceExpRequired,
     SummonCompanion,
+    IncreaseFireRate,
 }

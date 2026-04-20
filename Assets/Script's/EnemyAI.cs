@@ -4,6 +4,7 @@ public class EnemyAI : MonoBehaviour
 {
     [Header("References")]
     public GameObject player; 
+    public EnemySpawner spawner;
 
     [Header("Movement")]
     public float enemySpeed = 3f;
@@ -102,6 +103,9 @@ public class EnemyAI : MonoBehaviour
             if (ep != null)
                 ep.expAmount = expDropAmount;
         }
+
+        if (spawner != null)
+            spawner.OnEnemyKilled();
 
         Destroy(gameObject);
     }

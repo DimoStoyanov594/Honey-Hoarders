@@ -4,27 +4,18 @@ using TMPro;
 
 public class EXPManager : MonoBehaviour
 {
-    public int level;
-    public int currentExp;
+    public int level = 0;
+    public int currentExp = 0;
     public int expToLevel = 10;
-    public float epxGrowthMultiplier = 1.2f;
+    public float expGrowthMultiplier = 1.2f;
 
-    public Slider expSlider;
-    public TMP_Text currentLevelText;
-
+    [SerializeField] private Slider expSlider;
+    [SerializeField] private TMP_Text currentLevelText;
     [SerializeField] private CardManager cardManager;
 
     private void Start()
     {
         UpdateUI();
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Return))
-        {
-            GainExperience(2);
-        }
     }
 
     public void GainExperience(int amount)
@@ -33,26 +24,15 @@ public class EXPManager : MonoBehaviour
 
         while (currentExp >= expToLevel)
         {
-            LevelUp();
+            currentExp -= expToLevel;
+            level++;
+            expToLevel = Mathf.RoundToInt(expToLevel * expGrowthMultiplier);
+
+            if (cardManager != null)
+                cardManager.OnLevelUp();
         }
 
         UpdateUI();
-    }
-
-    private void LevelUp()
-    {
-        level++;
-        currentExp -= expToLevel;
-        expToLevel = Mathf.RoundToInt(expToLevel * epxGrowthMultiplier);
-
-        if (cardManager != null)
-        {
-            cardManager.OnLevelUp();
-        }
-        else
-        {
-            Debug.LogError("CardManager reference is missing in EXPManager.");
-        }
     }
 
     public void UpdateUI()

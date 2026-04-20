@@ -4,9 +4,11 @@ using UnityEngine.SceneManagement;
 public class PauseManager : MonoBehaviour
 {
     [Header("UI")]
+    [SerializeField] private GameObject pauseButton;
     [SerializeField] private GameObject pausePanel;
+    [SerializeField] private CanvasGroup pauseCanvasGroup;
 
-    private bool isPaused = false;
+    private bool isPaused;
 
     private void Start()
     {
@@ -32,15 +34,28 @@ public class PauseManager : MonoBehaviour
     public void PauseGame()
     {
         isPaused = true;
-        pausePanel.SetActive(true);
         Time.timeScale = 0f;
+
+        pauseButton.SetActive(false);
+        pausePanel.SetActive(true);
+
+        pauseCanvasGroup.alpha = 1f;
+        pauseCanvasGroup.interactable = true;
+        pauseCanvasGroup.blocksRaycasts = true;
     }
 
     public void ResumeGame()
     {
         isPaused = false;
-        pausePanel.SetActive(false);
         Time.timeScale = 1f;
+
+        pauseButton.SetActive(true);
+
+        pauseCanvasGroup.alpha = 0f;
+        pauseCanvasGroup.interactable = false;
+        pauseCanvasGroup.blocksRaycasts = false;
+
+        pausePanel.SetActive(false);
     }
 
     public void RestartGame()
@@ -53,15 +68,10 @@ public class PauseManager : MonoBehaviour
     {
         Time.timeScale = 1f;
 
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-#else
+    #else
         Application.Quit();
-#endif
-    }
-
-    public bool IsPaused()
-    {
-        return isPaused;
+    #endif
     }
 }

@@ -8,6 +8,9 @@ public class HealthManager : MonoBehaviour
     public int startingHealth = 3;
     public int startingMaxHealth = 3;
 
+    [Header("Limits")]
+    public int absoluteMaxHealth = 6;
+
     [Header("Runtime Health")]
     public int health;
     public int maxHealth;
@@ -30,10 +33,8 @@ public class HealthManager : MonoBehaviour
     {
         heartImages = new List<Image>(hearts);
 
-        maxHealth = startingMaxHealth;
-        health = startingHealth;
-
-        health = Mathf.Clamp(health, 0, maxHealth);
+        maxHealth = Mathf.Clamp(startingMaxHealth, 0, absoluteMaxHealth);
+        health = Mathf.Clamp(startingHealth, 0, maxHealth);
 
         EnsureHeartObjects();
         UpdateHearts();
@@ -80,11 +81,6 @@ public class HealthManager : MonoBehaviour
 
     void EnsureHeartObjects()
     {
-        if (heartImages.Count == 0)
-        {
-            Debug.LogError("HealthManager: No heart Image references assigned.");
-            return;
-        }
 
         while (heartImages.Count < maxHealth)
         {
@@ -100,6 +96,9 @@ public class HealthManager : MonoBehaviour
 
     public void UpdateHearts()
     {
+        maxHealth = Mathf.Clamp(maxHealth, 0, absoluteMaxHealth);
+        health = Mathf.Clamp(health, 0, maxHealth);
+
         EnsureHeartObjects();
 
         for (int i = 0; i < heartImages.Count; i++)
@@ -134,9 +133,23 @@ public class HealthManager : MonoBehaviour
 
     public void AddHeartUpgrade(int amount)
     {
-        maxHealth += amount;
-        health += amount;
+        for (int i = 0; i < amount; i++)
+        {
+            if (health < maxHealth)
+            {
+                health += 1;
+            }
+            else if (maxHealth < absoluteMaxHealth)
+            {
+                maxHealth += 1;
+                EnsureHeartObjects();
+                health = maxHealth;
+            }
+        }
+
+        maxHealth = Mathf.Clamp(maxHealth, 0, absoluteMaxHealth);
         health = Mathf.Clamp(health, 0, maxHealth);
+
         UpdateHearts();
         ShowHealthBar();
     }

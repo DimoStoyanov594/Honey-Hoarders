@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2229771149282527432}
   - component: {fileID: 5112323115409532889}
   - component: {fileID: 6397073267617619433}
-  - component: {fileID: 7182771914626387876}
+  - component: {fileID: 3123618976013469518}
   - component: {fileID: 7067959153679162987}
   m_Layer: 0
   m_Name: Bullet
@@ -29,8 +29,8 @@ Transform:
   m_GameObject: {fileID: 5723313813238260364}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 9.883131, y: 4.461036, z: 1}
+  m_LocalPosition: {x: 0.0075, y: 0.0043, z: 0}
+  m_LocalScale: {x: 0.08467146, y: 0.0382189, z: 0.00856727}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -107,9 +107,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletScript
   force: 8
-  damage: 1
   lifetime: 3
---- !u!70 &7182771914626387876
+--- !u!70 &3123618976013469518
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -143,8 +142,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.04, y: 0.05}
+  m_Offset: {x: 0.15275608, y: 0}
+  m_Size: {x: 4.3055143, y: 9.538584}
   m_Direction: 0
 --- !u!50 &7067959153679162987
 Rigidbody2D:

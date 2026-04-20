@@ -4,6 +4,7 @@ public class ShootingEnemyAI : MonoBehaviour
 {
     [Header("References")]
     public GameObject player;
+    public EnemySpawner spawner;
 
     [Header("Movement")]
     public float enemySpeed = 2f;
@@ -135,8 +136,13 @@ public class ShootingEnemyAI : MonoBehaviour
         {
             GameObject pickup = Instantiate(expPickupPrefab, transform.position, Quaternion.identity);
             ExpPickup ep = pickup.GetComponent<ExpPickup>();
-            if (ep != null) ep.expAmount = expDropAmount;
+            if (ep != null)
+                ep.expAmount = expDropAmount;
         }
+
+        if (spawner != null)
+            spawner.OnEnemyKilled();
+
         Destroy(gameObject);
     }
 }

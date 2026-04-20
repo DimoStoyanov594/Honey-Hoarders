@@ -1,20 +1,28 @@
 using UnityEngine;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 5f;
 
-    private Animator anim;
+    [Header("References")]
+    [SerializeField] private Animator anim;
+
+    [Header("Damage")]
+    [SerializeField] private float invulnerabilityTime = 0.75f;
+
     private Rigidbody2D rb;
     private HealthManager healthManager;
+    private PlayerDamageIndicator damageIndicator;
 
     private Vector2 movement;
+    private bool isInvulnerable = false;
 
     void Start()
     {
-        anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         healthManager = GetComponent<HealthManager>();
+        damageIndicator = GetComponent<PlayerDamageIndicator>();
     }
 
     void Update()
@@ -24,18 +32,20 @@ public class PlayerController : MonoBehaviour
 
         movement = new Vector2(moveX, moveY);
 
-        anim.SetFloat("Speed", movement.magnitude);
+        if (anim != null)
+        {
+            anim.SetFloat("Speed", movement.magnitude);
 
-        if (Input.GetMouseButtonDown(0))
-            anim.SetTrigger("Attack");
+            if (Input.GetMouseButtonDown(0))
+                anim.SetTrigger("Attack");
 
-        if (Input.GetKeyDown(KeyCode.R))
-            anim.SetTrigger("Reload");
+            if (Input.GetKeyDown(KeyCode.R))
+                anim.SetTrigger("Reload");
 
-        if (Input.GetKeyDown(KeyCode.H))
-            anim.SetTrigger("Hurt");
+            if (Input.GetKeyDown(KeyCode.H))
+                anim.SetTrigger("Hurt");
+        }
 
-        // Press P to test damage
         if (Input.GetKeyDown(KeyCode.P))
             TestDamage();
     }
@@ -55,14 +65,38 @@ public class PlayerController : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            healthManager.TakeDamage(1);
-            anim.SetTrigger("Hurt");
+            TakePlayerDamage(1);
         }
+    }
+
+    public void TakePlayerDamage(int amount)
+    {
+        if (isInvulnerable)
+            return;
+
+        healthManager.TakeDamage(amount);
+
+        if (anim != null)
+            anim.SetTrigger("Hurt");
+
+        if (damageIndicator != null)
+            damageIndicator.ShowDamageBlink();
+
+        StartCoroutine(InvulnerabilityRoutine());
+    }
+
+    private IEnumerator InvulnerabilityRoutine()
+    {
+        isInvulnerable = true;
+        yield return new WaitForSeconds(invulnerabilityTime);
+        isInvulnerable = false;
     }
 
     void TestDamage()
     {
         healthManager.TakeDamage(1);
-        anim.SetTrigger("Hurt");
+
+        if (anim != null)
+            anim.SetTrigger("Hurt");
     }
 }

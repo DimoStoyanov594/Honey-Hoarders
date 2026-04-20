@@ -32,8 +32,8 @@ Transform:
   m_GameObject: {fileID: 4936702342332607233}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.6406, y: -5.3567, z: 0}
-  m_LocalScale: {x: 6.666589, y: 5.965115, z: 0.9338}
+  m_LocalPosition: {x: -96.3373, y: -79.087, z: 0}
+  m_LocalScale: {x: 0.07443996, y: 0.066607215, z: 0.010426927}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -170,8 +170,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.26000002, y: 0.25}
+  m_Offset: {x: -1.0525019, y: -0.20473446}
+  m_Size: {x: 26.89473, y: 32.717243}
   m_Direction: 0
 --- !u!114 &7548645039845759283
 MonoBehaviour:
@@ -222,7 +222,7 @@ AudioSource:
   Priority: 150
   DopplerLevel: 1
   MinDistance: 0.5
-  MaxDistance: 4.2923174
+  MaxDistance: 4.330887
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -311,4 +311,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DistanceBasedAudio
   audioSource: {fileID: -5052399631612517372}
   player: {fileID: 0}
-  maxDistance: 19
+  maxDistance: 20

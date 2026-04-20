@@ -18,27 +18,16 @@ public class DistanceBasedAudio : MonoBehaviour
             if (playerObj != null)
             {
                 player = playerObj.transform;
-                Debug.Log(name + ": Player found -> " + player.name);
-            }
-            else
-            {
-                Debug.LogError(name + ": Player not found.");
             }
         }
 
         if (audioSource != null)
         {
-            Debug.Log(name + ": AudioSource found.");
 
             if (!audioSource.isPlaying)
             {
                 audioSource.Play();
-                Debug.Log(name + ": Audio started.");
             }
-        }
-        else
-        {
-            Debug.LogError(name + ": No AudioSource found.");
         }
     }
 

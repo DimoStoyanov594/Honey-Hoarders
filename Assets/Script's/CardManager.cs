@@ -21,18 +21,25 @@ public class CardManager : MonoBehaviour
     [SerializeField] private Transform player;
     [SerializeField] private Shooting shooting;
 
-    private EXPManager expManager;
+    [Header("Upgrade Values")]
+    [SerializeField] private int damageUpgradeAmount = 1;
+    [SerializeField] private float speedUpgradeAmount = 0.1f;
+
     private GameObject activeCompanion;
-    private HealthManager healthManager;
-    private PlayerController playerController;
+
+    [SerializeField] private EXPManager expManager;
+    [SerializeField] private HealthManager healthManager;
+    [SerializeField] private PlayerController playerController;
     private List<CardData> usedUniqueCards = new List<CardData>();
+
+    private bool cardSelectionOpen = false;
+    private bool cardAlreadyChosen = false;
+    private bool transitionRunning = false;
+    private bool isShowingCards = false;
+    private int queuedLevelUps = 0;
 
     private void Awake()
     {
-        expManager = GetComponent<EXPManager>();
-        healthManager = GetComponent<HealthManager>();
-        playerController = GetComponent<PlayerController>();
-
         cardSelectionPanel.SetActive(false);
 
         if (overlayImage != null)
@@ -45,55 +52,70 @@ public class CardManager : MonoBehaviour
 
     public void OnLevelUp()
     {
-        StartCoroutine(ShowCardsRoutine());
+        queuedLevelUps++;
+
+        if (!isShowingCards)
+            StartCoroutine(ShowCardsRoutine());
     }
 
     private IEnumerator ShowCardsRoutine()
     {
-        cardSelectionPanel.SetActive(true);
+        isShowingCards = true;
 
-        // Hide all slots first to clear any leftovers
-        foreach (CardUI slot in cardSlots)
-            slot.gameObject.SetActive(false);
-
-        List<CardData> offered = GetRandomCards(3);
-
-        for (int i = 0; i < cardSlots.Length; i++)
+        while (queuedLevelUps > 0)
         {
-            if (i < offered.Count)
+            queuedLevelUps--;
+
+            cardSelectionPanel.SetActive(true);
+
+            foreach (CardUI slot in cardSlots)
+                slot.gameObject.SetActive(false);
+
+            List<CardData> offered = GetRandomCards(3);
+
+            for (int i = 0; i < cardSlots.Length; i++)
             {
-                cardSlots[i].gameObject.SetActive(true);
-                cardSlots[i].Setup(offered[i], this);
+                if (i < offered.Count)
+                {
+                    cardSlots[i].gameObject.SetActive(true);
+                    cardSlots[i].Setup(offered[i], this);
+                }
+                else
+                {
+                    cardSlots[i].gameObject.SetActive(false);
+                }
             }
-            else
+
+            float elapsed = 0f;
+            while (elapsed < fadeDuration)
             {
-                cardSlots[i].gameObject.SetActive(false);
+                elapsed += Time.unscaledDeltaTime;
+                float t = elapsed / fadeDuration;
+
+                if (overlayImage != null)
+                {
+                    Color c = overlayImage.color;
+                    c.a = Mathf.Lerp(0f, 0.75f, t);
+                    overlayImage.color = c;
+                }
+
+                Time.timeScale = Mathf.Lerp(1f, 0f, t);
+                yield return null;
             }
+
+            Time.timeScale = 0f;
+
+            // wait until player picks a card
+            yield return new WaitUntil(() => !cardSelectionPanel.activeSelf);
         }
 
-        float elapsed = 0f;
-        while (elapsed < fadeDuration)
-        {
-            elapsed += Time.unscaledDeltaTime;
-            float t = elapsed / fadeDuration;
-
-            if (overlayImage != null)
-            {
-                Color c = overlayImage.color;
-                c.a = Mathf.Lerp(0, 0.75f, t);
-                overlayImage.color = c;
-            }
-
-            Time.timeScale = Mathf.Lerp(1f, 0f, t);
-            yield return null;
-        }
-
-        Time.timeScale = 0f;
+        isShowingCards = false;
     }
 
     private List<CardData> GetRandomCards(int count)
     {
         List<CardData> pool = new List<CardData>();
+
         foreach (CardData card in allCards)
         {
             if (!usedUniqueCards.Contains(card))
@@ -140,8 +162,10 @@ public class CardManager : MonoBehaviour
             yield return null;
         }
 
+
         Time.timeScale = 1f;
         cardSelectionPanel.SetActive(false);
+
         ApplyCardEffect(card);
     }
 
@@ -151,33 +175,25 @@ public class CardManager : MonoBehaviour
         {
             case CardEffectType.IncreaseMaxHealth:
                 if (healthManager != null)
-                {
                     healthManager.AddHeartUpgrade(card.value);
-                }
                 break;
 
             case CardEffectType.IncreaseDamage:
                 if (shooting != null)
                 {
-                    Debug.Log("Damage BEFORE: " + shooting.bulletDamage);
-                    shooting.bulletDamage += card.value;
-                    Debug.Log("Damage AFTER: " + shooting.bulletDamage);
-                }
-                else
-                {
-                    Debug.LogError("Shooting reference is NULL in CardManager.");
+                    shooting.SetBulletDamage(shooting.GetBulletDamage() + damageUpgradeAmount);
+
                 }
                 break;
 
             case CardEffectType.IncreaseSpeed:
                 if (playerController != null)
-                {
-                    playerController.moveSpeed += card.value;
-                }
+                    playerController.moveSpeed += speedUpgradeAmount;
                 break;
 
             case CardEffectType.ReduceExpRequired:
-                expManager.expToLevel = Mathf.Max(1, expManager.expToLevel - card.value);
+                if (expManager != null)
+                    expManager.expToLevel = Mathf.Max(1, expManager.expToLevel - card.value);
                 break;
 
             case CardEffectType.SummonCompanion:
@@ -189,11 +205,30 @@ public class CardManager : MonoBehaviour
                         Quaternion.identity
                     );
 
-                    activeCompanion.GetComponent<CompanionAI>().Initialize(player);
+                    // Try to match the player's visible sorting
+                    SpriteRenderer companionRenderer = activeCompanion.GetComponent<SpriteRenderer>();
+                    SpriteRenderer playerRenderer = player.GetComponentInChildren<SpriteRenderer>();
+
+                    if (companionRenderer != null && playerRenderer != null)
+                    {
+                        companionRenderer.sortingLayerID = playerRenderer.sortingLayerID;
+                        companionRenderer.sortingOrder = playerRenderer.sortingOrder;
+                    }
+
+                    CompanionAI companionAI = activeCompanion.GetComponent<CompanionAI>();
+                    if (companionAI != null)
+                        companionAI.Initialize(player);
+                }
+                break;
+
+            case CardEffectType.IncreaseFireRate:
+                if (shooting != null)
+                {
+                    shooting.SetTimeBetweenFiring(
+                        shooting.GetTimeBetweenFiring() - (card.value * 0.05f)
+                    );
                 }
                 break;
         }
-
-        Debug.Log($"Applied: {card.cardName}");
     }
 }
