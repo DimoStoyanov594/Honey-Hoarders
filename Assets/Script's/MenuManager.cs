@@ -5,13 +5,14 @@ public class MenuManager : MonoBehaviour
 {
     public void PlayButton()
     {
-        // Loads game with whatever skin was last equipped — no need to touch PlayerPrefs
-        SceneManager.LoadScene("Game-Scene");
+        if (UIButtonAudio.Instance != null)
+            UIButtonAudio.Instance.PlayClickAndLoadScene("Game-Scene");
     }
 
     public void SkinsButton()
     {
-        SceneManager.LoadScene("Skin_Select");
+        if (UIButtonAudio.Instance != null)
+            UIButtonAudio.Instance.PlayClickAndLoadScene("Skin_Select");
     }
 
     public void QuitButton()
@@ -19,7 +20,8 @@ public class MenuManager : MonoBehaviour
         #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
         #else
-            Application.Quit();
+            if (UIButtonAudio.Instance != null)
+        UIButtonAudio.Instance.PlayClickAndQuit();
         #endif
     }
 }

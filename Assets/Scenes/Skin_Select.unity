@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 86493638}
   - component: {fileID: 86493637}
   - component: {fileID: 86493636}
+  - component: {fileID: 86493639}
   m_Layer: 5
   m_Name: Next
   m_TagString: Untagged
@@ -252,6 +253,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 86493634}
   m_CullTransparentMesh: 1
+--- !u!114 &86493639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 86493634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f5a049ec005d7c4f8dffc2a150172bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIButtonSound
 --- !u!1 &662780837
 GameObject:
   m_ObjectHideFlags: 0
@@ -1684,6 +1697,7 @@ GameObject:
   - component: {fileID: 2075120702}
   - component: {fileID: 2075120701}
   - component: {fileID: 2075120700}
+  - component: {fileID: 2075120703}
   m_Layer: 5
   m_Name: Back
   m_TagString: Untagged
@@ -1805,6 +1819,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2075120698}
   m_CullTransparentMesh: 1
+--- !u!114 &2075120703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2075120698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f5a049ec005d7c4f8dffc2a150172bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIButtonSound
 --- !u!1 &2128659677
 GameObject:
   m_ObjectHideFlags: 0
@@ -1817,6 +1843,7 @@ GameObject:
   - component: {fileID: 2128659681}
   - component: {fileID: 2128659680}
   - component: {fileID: 2128659679}
+  - component: {fileID: 2128659682}
   m_Layer: 5
   m_Name: Play
   m_TagString: Untagged
@@ -1938,6 +1965,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2128659677}
   m_CullTransparentMesh: 1
+--- !u!114 &2128659682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2128659677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f5a049ec005d7c4f8dffc2a150172bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIButtonSound
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

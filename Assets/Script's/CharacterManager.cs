@@ -67,6 +67,7 @@ public class CharacterManager : MonoBehaviour
 
     public void GoToMainMenu()
     {
-        SceneManager.LoadScene("Main_Menu");
+        if (UIButtonAudio.Instance != null)
+            UIButtonAudio.Instance.PlayClickAndLoadScene("Main_Menu");
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,7 +8,11 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private CanvasGroup gameOverCanvasGroup;
 
+    [Header("UI Audio")]
+    [SerializeField] private float transitionClickDelay = 0.1f;
+
     private bool gameOverActive = false;
+    private bool isTransitioning = false;
 
     private void Start()
     {
@@ -32,9 +37,10 @@ public class GameOverManager : MonoBehaviour
             return;
 
         gameOverActive = true;
+        isTransitioning = false;
 
-        // If card selection dimmed the audio before death,
-        // restore full volume first, then hard-pause the sound.
+        // Restore full volume first in case another system dimmed it,
+        // then hard-pause world audio.
         AudioListener.volume = 1f;
         AudioListener.pause = true;
 
@@ -58,36 +64,102 @@ public class GameOverManager : MonoBehaviour
 
     public void RestartGame()
     {
-        ResetGameOverAndAudioState();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        if (!gameOverActive || isTransitioning)
+            return;
+
+        StartCoroutine(RestartGameRoutine());
     }
 
     public void QuitToScene(string sceneName)
     {
-        ResetGameOverAndAudioState();
-        SceneManager.LoadScene(sceneName);
+        if (!gameOverActive || isTransitioning)
+            return;
+
+        if (string.IsNullOrWhiteSpace(sceneName))
+        {
+            Debug.LogError("QuitToScene was called with an empty scene name.");
+            return;
+        }
+
+        StartCoroutine(QuitToSceneRoutine(sceneName));
     }
 
     public void QuitToMainMenu()
     {
-        ResetGameOverAndAudioState();
-        SceneManager.LoadScene("Main_Menu");
+        if (!gameOverActive || isTransitioning)
+            return;
+
+        StartCoroutine(QuitToMainMenuRoutine());
     }
 
     public void QuitGame()
     {
+        if (!gameOverActive || isTransitioning)
+            return;
+
+        StartCoroutine(QuitGameRoutine());
+    }
+
+    private IEnumerator RestartGameRoutine()
+    {
+        isTransitioning = true;
+
+        PlayUIClick();
+        yield return new WaitForSecondsRealtime(transitionClickDelay);
+
+        ResetGameOverAndAudioState();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private IEnumerator QuitToSceneRoutine(string sceneName)
+    {
+        isTransitioning = true;
+
+        PlayUIClick();
+        yield return new WaitForSecondsRealtime(transitionClickDelay);
+
+        ResetGameOverAndAudioState();
+        SceneManager.LoadScene(sceneName);
+    }
+
+    private IEnumerator QuitToMainMenuRoutine()
+    {
+        isTransitioning = true;
+
+        PlayUIClick();
+        yield return new WaitForSecondsRealtime(transitionClickDelay);
+
+        ResetGameOverAndAudioState();
+        SceneManager.LoadScene("Main_Menu");
+    }
+
+    private IEnumerator QuitGameRoutine()
+    {
+        isTransitioning = true;
+
+        PlayUIClick();
+        yield return new WaitForSecondsRealtime(transitionClickDelay);
+
         ResetGameOverAndAudioState();
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-    #else
+#else
         Application.Quit();
-    #endif
+#endif
+    }
+
+    private void PlayUIClick()
+    {
+        if (UIButtonAudio.Instance != null)
+            UIButtonAudio.Instance.PlayClick();
     }
 
     private void ResetGameOverAndAudioState()
     {
         gameOverActive = false;
+        isTransitioning = false;
+
         Time.timeScale = 1f;
         AudioListener.pause = false;
         AudioListener.volume = 1f;

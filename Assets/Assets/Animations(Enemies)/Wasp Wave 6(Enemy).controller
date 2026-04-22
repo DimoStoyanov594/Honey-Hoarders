@@ -6,7 +6,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Wasp(Enemy)
+  m_Name: Wasp Wave 6(Enemy)
   serializedVersion: 5
   m_AnimatorParameters: []
   m_AnimatorLayers:
@@ -29,7 +29,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Wasp(Enemy)
+  m_Name: Wasp Wave 6(Enemy)
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -42,7 +42,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 164fc96be7ef0f047bc737b884db66b4, type: 2}
+  m_Motion: {fileID: 7400000, guid: 3c74a0b4143cbfd4aa976197be968733, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -59,7 +59,7 @@ AnimatorStateMachine:
   m_ChildStates:
   - serializedVersion: 1
     m_State: {fileID: 2868661667181179019}
-    m_Position: {x: 210, y: 0, z: 0}
+    m_Position: {x: 200, y: 0, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 8868794012294554686}
     m_Position: {x: 250, y: 90, z: 0}
@@ -70,7 +70,7 @@ AnimatorStateMachine:
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: 50, y: 20, z: 0}
   m_EntryPosition: {x: 50, y: 120, z: 0}
-  m_ExitPosition: {x: 790, y: 120, z: 0}
+  m_ExitPosition: {x: 800, y: 120, z: 0}
   m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}
   m_DefaultState: {fileID: 2868661667181179019}
 --- !u!1102 &8868794012294554686
@@ -80,7 +80,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Wasp(Enemy) 0
+  m_Name: Wasp Wave 6(Enemy) 0
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -93,7 +93,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 164fc96be7ef0f047bc737b884db66b4, type: 2}
+  m_Motion: {fileID: 7400000, guid: 3c74a0b4143cbfd4aa976197be968733, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 

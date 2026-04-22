@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,11 +19,15 @@ public class PauseManager : MonoBehaviour
     [SerializeField] private GameObject pauseButton;
     [SerializeField] private GameObject pausePanel;
     [SerializeField] private CanvasGroup pauseCanvasGroup;
-    [SerializeField] private UIButtonAudio uiAudio;
 
     [Header("References")]
     [SerializeField] private GameOverManager gameOverManager;
+
+    [Header("UI Audio")]
+    [SerializeField] private float transitionClickDelay = 0.1f;
+
     private PauseSource activePauseSources = PauseSource.None;
+    private bool isTransitioning = false;
 
     public static event Action<bool> OnPauseStateChanged;
 
@@ -34,6 +39,7 @@ public class PauseManager : MonoBehaviour
     {
         return gameOverManager != null && gameOverManager.IsGameOverActive();
     }
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -47,21 +53,19 @@ public class PauseManager : MonoBehaviour
 
     private void Start()
     {
-        // Safety reset in case audio was left paused by another scene/state
         AudioListener.pause = false;
 
         HidePauseMenuUI();
         RefreshPauseState();
     }
 
-   private void Update()
+    private void Update()
     {
         if (IsGameOverActive())
             return;
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // Do not allow pause menu toggling while card selection is active
             if (IsCardSelectionPaused)
                 return;
 
@@ -71,13 +75,13 @@ public class PauseManager : MonoBehaviour
 
     public void TogglePauseMenu()
     {
-        if (IsGameOverActive())
+        if (IsGameOverActive() || isTransitioning)
             return;
 
         if (IsPauseMenuPaused)
-            ResumeFromSource(PauseSource.PauseMenu);
+            ResumeGame();
         else
-            PauseFromSource(PauseSource.PauseMenu);
+            PauseGame();
     }
 
     public void PauseFromSource(PauseSource source)
@@ -111,8 +115,8 @@ public class PauseManager : MonoBehaviour
 
         Time.timeScale = paused ? 0f : 1f;
 
-        // Pause audio only for hard pauses.
-        // CardSelection should only dim volume through CardManager, not fully pause audio.
+        // Only hard-pause audio for the pause menu.
+        // Card selection should not fully pause audio.
         bool shouldPauseAudio = HasPauseSource(PauseSource.PauseMenu);
         AudioListener.pause = shouldPauseAudio;
 
@@ -153,44 +157,88 @@ public class PauseManager : MonoBehaviour
 
     public void PauseGame()
     {
-        if (IsGameOverActive())
+        if (IsGameOverActive() || isTransitioning)
             return;
 
-        if (uiAudio != null)
-            uiAudio.PlayClick();
-
+        PlayUIClick();
         PauseFromSource(PauseSource.PauseMenu);
     }
 
     public void ResumeGame()
     {
-        if (IsGameOverActive())
+        if (IsGameOverActive() || isTransitioning)
             return;
 
+        PlayUIClick();
         ResumeFromSource(PauseSource.PauseMenu);
     }
 
     public void RestartGame()
     {
-        ResetPauseAndAudioState();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        if (isTransitioning)
+            return;
+
+        StartCoroutine(RestartGameRoutine());
     }
 
     public void QuitToMainMenu()
     {
-        ResetPauseAndAudioState();
-        SceneManager.LoadScene("Main_Menu");
+        if (isTransitioning)
+            return;
+
+        StartCoroutine(QuitToMainMenuRoutine());
     }
 
     public void QuitGame()
     {
+        if (isTransitioning)
+            return;
+
+        StartCoroutine(QuitGameRoutine());
+    }
+
+    private IEnumerator RestartGameRoutine()
+    {
+        isTransitioning = true;
+
+        PlayUIClick();
+        yield return new WaitForSecondsRealtime(transitionClickDelay);
+
+        ResetPauseAndAudioState();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private IEnumerator QuitToMainMenuRoutine()
+    {
+        isTransitioning = true;
+
+        PlayUIClick();
+        yield return new WaitForSecondsRealtime(transitionClickDelay);
+
+        ResetPauseAndAudioState();
+        SceneManager.LoadScene("Main_Menu");
+    }
+
+    private IEnumerator QuitGameRoutine()
+    {
+        isTransitioning = true;
+
+        PlayUIClick();
+        yield return new WaitForSecondsRealtime(transitionClickDelay);
+
         ResetPauseAndAudioState();
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-    #else
+#else
         Application.Quit();
-    #endif
+#endif
+    }
+
+    private void PlayUIClick()
+    {
+        if (UIButtonAudio.Instance != null)
+            UIButtonAudio.Instance.PlayClick();
     }
 
     private void ResetPauseAndAudioState()
@@ -199,5 +247,6 @@ public class PauseManager : MonoBehaviour
         Time.timeScale = 1f;
         AudioListener.pause = false;
         AudioListener.volume = 1f;
+        HidePauseMenuUI();
     }
 }
