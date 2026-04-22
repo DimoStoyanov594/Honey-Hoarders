@@ -22,8 +22,20 @@ public class EnemyAI : MonoBehaviour
     public GameObject expPickupPrefab;
     public int expDropAmount = 2;
 
+    [Header("Enemy Overlap")]
+    [SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private float overlapCheckRadius = 1f;
+
     private float distance;
     private float damageTimer = 0f;
+
+    private Collider2D ownCollider;
+    private readonly Collider2D[] overlapResults = new Collider2D[16];
+
+    void Start()
+    {
+        ownCollider = GetComponent<Collider2D>();
+    }
 
     void Update()
     {
@@ -46,11 +58,44 @@ public class EnemyAI : MonoBehaviour
             transform.rotation = Quaternion.Euler(Vector3.forward * angle);
         }
 
+        ResolveEnemyOverlap();
+
         if (enemyHealth <= 0)
             Die();
 
         if (damageTimer > 0f)
             damageTimer -= Time.deltaTime;
+    }
+
+    private void ResolveEnemyOverlap()
+    {
+        if (ownCollider == null)
+            return;
+
+        ContactFilter2D filter = new ContactFilter2D();
+        filter.useLayerMask = true;
+        filter.layerMask = enemyLayer;
+        filter.useTriggers = true;
+
+        int count = Physics2D.OverlapCircle(transform.position, overlapCheckRadius, filter, overlapResults);
+
+        for (int i = 0; i < count; i++)
+        {
+            Collider2D other = overlapResults[i];
+
+            if (other == null || other == ownCollider)
+                continue;
+
+            ColliderDistance2D distanceInfo = ownCollider.Distance(other);
+
+            if (distanceInfo.isOverlapped)
+            {
+                Vector2 pushDir = -distanceInfo.normal;
+                float pushAmount = -distanceInfo.distance;
+
+                transform.position += (Vector3)(pushDir * pushAmount * 0.5f);
+            }
+        }
     }
 
     void OnTriggerEnter2D(Collider2D collision)
@@ -108,5 +153,11 @@ public class EnemyAI : MonoBehaviour
             spawner.OnEnemyKilled();
 
         Destroy(gameObject);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, overlapCheckRadius);
     }
 }

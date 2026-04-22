@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 7548645039845759283}
   - component: {fileID: -5052399631612517372}
   - component: {fileID: 7102704791163268258}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Wasp(Enemy)
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -186,9 +186,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShootingEnemyAI
   player: {fileID: 0}
+  spawner: {fileID: 0}
   enemySpeed: 5
   enemyMaxFollow: 999
-  enemyHealth: 1
+  enemyHealth: 3
   bulletDamage: 1
   damageToPlayer: 1
   damageCooldown: 50
@@ -199,7 +200,11 @@ MonoBehaviour:
   bulletSpeed: 7
   bulletDamageToPlayer: 1
   expPickupPrefab: {fileID: 7055606611775191274, guid: 63bab532815f079429ded9d80ee7dcf1, type: 3}
-  expDropAmount: 1
+  expDropAmount: 2
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 4096
+  overlapCheckRadius: 1
 --- !u!82 &-5052399631612517372
 AudioSource:
   m_ObjectHideFlags: 0

@@ -15,6 +15,17 @@ public class Shooting : MonoBehaviour
 
     private Camera mainCam;
     private float timer;
+    private bool pauseAimAndShooting = false;
+
+    private void OnEnable()
+    {
+        PauseManager.OnPauseStateChanged += HandlePauseStateChanged;
+    }
+
+    private void OnDisable()
+    {
+        PauseManager.OnPauseStateChanged -= HandlePauseStateChanged;
+    }
 
     private void Start()
     {
@@ -22,6 +33,9 @@ public class Shooting : MonoBehaviour
 
         if (player == null)
             player = transform.root;
+
+        if (PauseManager.Instance != null)
+            pauseAimAndShooting = PauseManager.Instance.IsPaused;
     }
 
     private void Update()
@@ -29,10 +43,18 @@ public class Shooting : MonoBehaviour
         if (mainCam == null)
             mainCam = Camera.main;
 
+        if (pauseAimAndShooting)
+            return;
+
         timer += Time.deltaTime;
 
         UpdateAim();
         HandleShooting();
+    }
+
+    private void HandlePauseStateChanged(bool paused)
+    {
+        pauseAimAndShooting = paused;
     }
 
     private void UpdateAim()
@@ -42,8 +64,6 @@ public class Shooting : MonoBehaviour
 
         Transform rotationTarget = aimPivot != null ? aimPivot : transform;
 
-        // If a stable player/root exists, keep the pivot attached to it.
-        // This helps if the visible skin changes but the gameplay pivot stays.
         if (aimPivot != null && player != null)
             aimPivot.position = player.position;
 
@@ -72,19 +92,13 @@ public class Shooting : MonoBehaviour
     private void Shoot()
     {
         if (bulletPrefab == null)
-        {
             return;
-        }
 
         if (firePoint == null)
-        {
             return;
-        }
 
         if (mainCam == null)
-        {
             return;
-        }
 
         Vector3 mouseScreenPos = Input.mousePosition;
         mouseScreenPos.z = Mathf.Abs(mainCam.transform.position.z);

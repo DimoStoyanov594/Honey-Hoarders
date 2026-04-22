@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 5671066120440384602}
   - component: {fileID: 8505724298462653643}
   - component: {fileID: 2361725594780679490}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Beetle(Enemy)
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -148,14 +148,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
   player: {fileID: 0}
+  spawner: {fileID: 0}
   enemySpeed: 3
   enemyMaxFollow: 999
-  enemyHealth: 3
+  enemyHealth: 5
   bulletDamage: 1
   damageToPlayer: 1
   damageCooldown: 50
   expPickupPrefab: {fileID: 7055606611775191274, guid: 63bab532815f079429ded9d80ee7dcf1, type: 3}
-  expDropAmount: 3
+  expDropAmount: 4
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 4096
+  overlapCheckRadius: 1
 --- !u!82 &5671066120440384602
 AudioSource:
   m_ObjectHideFlags: 0

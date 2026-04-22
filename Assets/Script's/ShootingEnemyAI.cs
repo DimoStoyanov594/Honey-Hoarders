@@ -30,9 +30,21 @@ public class ShootingEnemyAI : MonoBehaviour
     public GameObject expPickupPrefab;
     public int expDropAmount = 3;
 
+    [Header("Enemy Overlap")]
+    [SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private float overlapCheckRadius = 1f;
+
     private float distance;
     private float damageTimer = 0f;
     private float shootTimer = 0f;
+
+    private Collider2D ownCollider;
+    private readonly Collider2D[] overlapResults = new Collider2D[16];
+
+    void Start()
+    {
+        ownCollider = GetComponent<Collider2D>();
+    }
 
     void Update()
     {
@@ -40,16 +52,13 @@ public class ShootingEnemyAI : MonoBehaviour
 
         distance = Vector2.Distance(transform.position, player.transform.position);
 
-        // Always recalculate direction every frame so rotation and shooting stay accurate
         Vector2 direction = (player.transform.position - transform.position).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
         if (distance < enemyMaxFollow)
         {
-            // Always face the player while in range
             transform.rotation = Quaternion.Euler(0f, 0f, angle);
 
-            // Only walk closer if outside the stop-chase range
             if (distance > stopChaseRange)
             {
                 transform.position = Vector2.MoveTowards(
@@ -60,11 +69,11 @@ public class ShootingEnemyAI : MonoBehaviour
             }
         }
 
-        // Shooting cooldown
+        ResolveEnemyOverlap();
+
         if (shootTimer > 0f)
             shootTimer -= Time.deltaTime;
 
-        // Shoot when in range and cooldown is ready
         if (distance < shootRange && shootTimer <= 0f)
         {
             Shoot(direction);
@@ -76,6 +85,37 @@ public class ShootingEnemyAI : MonoBehaviour
 
         if (damageTimer > 0f)
             damageTimer -= Time.deltaTime;
+    }
+
+    private void ResolveEnemyOverlap()
+    {
+        if (ownCollider == null)
+            return;
+
+        ContactFilter2D filter = new ContactFilter2D();
+        filter.useLayerMask = true;
+        filter.layerMask = enemyLayer;
+        filter.useTriggers = true;
+
+        int count = Physics2D.OverlapCircle(transform.position, overlapCheckRadius, filter, overlapResults);
+
+        for (int i = 0; i < count; i++)
+        {
+            Collider2D other = overlapResults[i];
+
+            if (other == null || other == ownCollider)
+                continue;
+
+            ColliderDistance2D distanceInfo = ownCollider.Distance(other);
+
+            if (distanceInfo.isOverlapped)
+            {
+                Vector2 pushDir = -distanceInfo.normal;
+                float pushAmount = -distanceInfo.distance;
+
+                transform.position += (Vector3)(pushDir * pushAmount * 0.5f);
+            }
+        }
     }
 
     void Shoot(Vector2 direction)
@@ -117,14 +157,18 @@ public class ShootingEnemyAI : MonoBehaviour
     void OnTriggerStay2D(Collider2D other)
     {
         if (damageTimer > 0f) return;
+
         if (other.CompareTag("Player"))
         {
             HealthManager hm = other.GetComponent<HealthManager>();
             if (hm != null)
             {
                 hm.TakeDamage(damageToPlayer);
+
                 Animator anim = other.GetComponent<Animator>();
-                if (anim != null) anim.SetTrigger("Hurt");
+                if (anim != null)
+                    anim.SetTrigger("Hurt");
+
                 damageTimer = damageCooldown;
             }
         }
@@ -144,5 +188,11 @@ public class ShootingEnemyAI : MonoBehaviour
             spawner.OnEnemyKilled();
 
         Destroy(gameObject);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, overlapCheckRadius);
     }
 }

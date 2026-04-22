@@ -11,26 +11,60 @@ public class PlayerController : MonoBehaviour
     [Header("Damage")]
     [SerializeField] private float invulnerabilityTime = 0.75f;
 
+    [Header("Movement Audio")]
+    [SerializeField] private AudioSource moveAudio;
+    [SerializeField] private float fadeSpeed = 5f;
+    [SerializeField] private float maxVolume = 0.07f;
+
+    private float targetVolume = 0f;
+    private float baseVolume = 0f;
+
     private Rigidbody2D rb;
     private HealthManager healthManager;
     private PlayerDamageIndicator damageIndicator;
 
     private Vector2 movement;
     private bool isInvulnerable = false;
+    private bool isDead = false;
+
+    private Coroutine invulnerabilityCoroutine;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         healthManager = GetComponent<HealthManager>();
         damageIndicator = GetComponent<PlayerDamageIndicator>();
+
+        if (moveAudio != null)
+        {
+            baseVolume = moveAudio.volume;
+            moveAudio.loop = true;
+            moveAudio.volume = 0f;
+
+            if (!moveAudio.isPlaying)
+                moveAudio.Play();
+        }
     }
 
     void Update()
     {
+        if (isDead)
+        {
+            movement = Vector2.zero;
+            targetVolume = 0f;
+            FadeMovementAudio();
+            return;
+        }
+
         float moveX = Input.GetAxis("Horizontal");
         float moveY = Input.GetAxis("Vertical");
 
         movement = new Vector2(moveX, moveY);
+
+        bool isMoving = movement.sqrMagnitude > 0.01f;
+        targetVolume = isMoving ? baseVolume : 0f;
+
+        FadeMovementAudio();
 
         if (anim != null)
         {
@@ -47,11 +81,14 @@ public class PlayerController : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.P))
-            TestDamage();
+            TakePlayerDamage(1);
     }
 
     void FixedUpdate()
     {
+        if (isDead)
+            return;
+
         rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
 
         if (movement != Vector2.zero)
@@ -63,6 +100,9 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        if (isDead)
+            return;
+
         if (other.CompareTag("Enemy"))
         {
             TakePlayerDamage(1);
@@ -71,10 +111,18 @@ public class PlayerController : MonoBehaviour
 
     public void TakePlayerDamage(int amount)
     {
-        if (isInvulnerable)
+        if (!CanTakeDamage() || healthManager == null)
             return;
 
-        healthManager.TakeDamage(amount);
+        isInvulnerable = true;
+
+        healthManager.TakeDamage(amount, true);
+
+        if (healthManager.IsDead())
+        {
+            invulnerabilityCoroutine = null;
+            return;
+        }
 
         if (anim != null)
             anim.SetTrigger("Hurt");
@@ -82,21 +130,72 @@ public class PlayerController : MonoBehaviour
         if (damageIndicator != null)
             damageIndicator.ShowDamageBlink();
 
-        StartCoroutine(InvulnerabilityRoutine());
+        if (invulnerabilityCoroutine != null)
+            StopCoroutine(invulnerabilityCoroutine);
+
+        invulnerabilityCoroutine = StartCoroutine(InvulnerabilityRoutine());
     }
 
     private IEnumerator InvulnerabilityRoutine()
     {
-        isInvulnerable = true;
         yield return new WaitForSeconds(invulnerabilityTime);
         isInvulnerable = false;
+        invulnerabilityCoroutine = null;
     }
 
-    void TestDamage()
+    public bool CanTakeDamage()
     {
-        healthManager.TakeDamage(1);
+        return !isDead && !isInvulnerable && healthManager != null && !healthManager.IsDead();
+    }
+
+    public bool IsInvulnerable()
+    {
+        return isInvulnerable;
+    }
+
+    public bool IsDead()
+    {
+        return isDead;
+    }
+
+    public void HandleDeath()
+    {
+        if (isDead)
+            return;
+
+        isDead = true;
+        isInvulnerable = true;
+        movement = Vector2.zero;
+        targetVolume = 0f;
+
+        if (invulnerabilityCoroutine != null)
+        {
+            StopCoroutine(invulnerabilityCoroutine);
+            invulnerabilityCoroutine = null;
+        }
+
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
 
         if (anim != null)
+        {
+            anim.SetFloat("Speed", 0f);
             anim.SetTrigger("Hurt");
+        }
+    }
+
+    private void FadeMovementAudio()
+    {
+        if (moveAudio == null)
+            return;
+
+        moveAudio.volume = Mathf.MoveTowards(
+            moveAudio.volume,
+            targetVolume,
+            fadeSpeed * Time.deltaTime
+        );
     }
 }

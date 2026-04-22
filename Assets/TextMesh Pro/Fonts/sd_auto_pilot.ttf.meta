@@ -1,15 +1,15 @@
 fileFormatVersion: 2
-guid: 819acba3a78a68a4f81d74458cc0a51d
+guid: 3b9fd0c38937d8f4d9874b82cc4f5e5d
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
-  fontSize: 16
+  fontSize: 80
   forceTextureCase: -1
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - KiwiSoda
+  - SD Auto Pilot
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 2

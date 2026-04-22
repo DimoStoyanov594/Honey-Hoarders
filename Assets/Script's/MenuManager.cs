@@ -13,4 +13,13 @@ public class MenuManager : MonoBehaviour
     {
         SceneManager.LoadScene("Skin_Select");
     }
+
+    public void QuitButton()
+    {
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+        #else
+            Application.Quit();
+        #endif
+    }
 }

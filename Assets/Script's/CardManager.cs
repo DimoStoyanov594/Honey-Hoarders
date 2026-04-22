@@ -24,7 +24,14 @@ public class CardManager : MonoBehaviour
     [Header("Upgrade Values")]
     [SerializeField] private int damageUpgradeAmount = 1;
     [SerializeField] private float speedUpgradeAmount = 0.1f;
+    [SerializeField] private float fireRateUpgradeAmount = 0.05f;
+    [SerializeField] private float minimumTimeBetweenShots = 0.05f;
 
+    [Header("Audio")]
+    [SerializeField, Range(0f, 1f)] private float cardScreenVolume = 0.25f;
+
+    private float previousAudioVolume = 1f;
+    private bool cardAudioDimmed = false;
     private GameObject activeCompanion;
 
     [SerializeField] private EXPManager expManager;
@@ -32,12 +39,14 @@ public class CardManager : MonoBehaviour
     [SerializeField] private PlayerController playerController;
     private List<CardData> usedUniqueCards = new List<CardData>();
 
-    private bool cardSelectionOpen = false;
-    private bool cardAlreadyChosen = false;
-    private bool transitionRunning = false;
     private bool isShowingCards = false;
     private int queuedLevelUps = 0;
+    private bool cardAlreadyChosen = false;
 
+    private void OnDisable()
+    {
+        RestoreAudioAfterCardScreen();
+    }
     private void Awake()
     {
         cardSelectionPanel.SetActive(false);
@@ -45,11 +54,28 @@ public class CardManager : MonoBehaviour
         if (overlayImage != null)
         {
             Color c = overlayImage.color;
-            c.a = 0;
+            c.a = 0f;
             overlayImage.color = c;
         }
     }
+    private void LowerAudioForCardScreen()
+    {
+        if (cardAudioDimmed)
+            return;
 
+        previousAudioVolume = AudioListener.volume;
+        AudioListener.volume = cardScreenVolume;
+        cardAudioDimmed = true;
+    }
+
+    private void RestoreAudioAfterCardScreen()
+    {
+        if (!cardAudioDimmed)
+            return;
+
+        AudioListener.volume = previousAudioVolume;
+        cardAudioDimmed = false;
+    }
     public void OnLevelUp()
     {
         queuedLevelUps++;
@@ -65,6 +91,7 @@ public class CardManager : MonoBehaviour
         while (queuedLevelUps > 0)
         {
             queuedLevelUps--;
+            cardAlreadyChosen = false;
 
             cardSelectionPanel.SetActive(true);
 
@@ -86,6 +113,11 @@ public class CardManager : MonoBehaviour
                 }
             }
 
+            if (PauseManager.Instance != null)
+            PauseManager.Instance.PauseFromSource(PauseManager.PauseSource.CardSelection);
+
+            LowerAudioForCardScreen();
+
             float elapsed = 0f;
             while (elapsed < fadeDuration)
             {
@@ -99,13 +131,9 @@ public class CardManager : MonoBehaviour
                     overlayImage.color = c;
                 }
 
-                Time.timeScale = Mathf.Lerp(1f, 0f, t);
                 yield return null;
             }
 
-            Time.timeScale = 0f;
-
-            // wait until player picks a card
             yield return new WaitUntil(() => !cardSelectionPanel.activeSelf);
         }
 
@@ -137,6 +165,11 @@ public class CardManager : MonoBehaviour
 
     public void SelectCard(CardData card)
     {
+        if (cardAlreadyChosen)
+            return;
+
+        cardAlreadyChosen = true;
+
         if (card.isUnique)
             usedUniqueCards.Add(card);
 
@@ -158,13 +191,15 @@ public class CardManager : MonoBehaviour
                 overlayImage.color = c;
             }
 
-            Time.timeScale = Mathf.Lerp(0f, 1f, t);
             yield return null;
         }
 
-
-        Time.timeScale = 1f;
         cardSelectionPanel.SetActive(false);
+
+        RestoreAudioAfterCardScreen();
+
+        if (PauseManager.Instance != null)
+            PauseManager.Instance.ResumeFromSource(PauseManager.PauseSource.CardSelection);
 
         ApplyCardEffect(card);
     }
@@ -180,10 +215,7 @@ public class CardManager : MonoBehaviour
 
             case CardEffectType.IncreaseDamage:
                 if (shooting != null)
-                {
                     shooting.SetBulletDamage(shooting.GetBulletDamage() + damageUpgradeAmount);
-
-                }
                 break;
 
             case CardEffectType.IncreaseSpeed:
@@ -205,7 +237,6 @@ public class CardManager : MonoBehaviour
                         Quaternion.identity
                     );
 
-                    // Try to match the player's visible sorting
                     SpriteRenderer companionRenderer = activeCompanion.GetComponent<SpriteRenderer>();
                     SpriteRenderer playerRenderer = player.GetComponentInChildren<SpriteRenderer>();
 
@@ -224,9 +255,8 @@ public class CardManager : MonoBehaviour
             case CardEffectType.IncreaseFireRate:
                 if (shooting != null)
                 {
-                    shooting.SetTimeBetweenFiring(
-                        shooting.GetTimeBetweenFiring() - (card.value * 0.05f)
-                    );
+                    float newTime = shooting.GetTimeBetweenFiring() - fireRateUpgradeAmount;
+                    shooting.SetTimeBetweenFiring(Mathf.Max(minimumTimeBetweenShots, newTime));
                 }
                 break;
         }

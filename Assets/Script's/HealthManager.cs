@@ -25,8 +25,12 @@ public class HealthManager : MonoBehaviour
     public float displayDuration = 2f;
     public float fadeDuration = 1f;
 
+    [Header("Death")]
+    [SerializeField] private GameOverManager gameOverManager;
+
     private float hideTimer = 0f;
     private bool isFading = false;
+    private bool isDead = false;
     private List<Image> heartImages = new List<Image>();
 
     void Start()
@@ -45,6 +49,9 @@ public class HealthManager : MonoBehaviour
 
     void Update()
     {
+        if (isDead)
+            return;
+
         HandleFading();
     }
 
@@ -81,7 +88,6 @@ public class HealthManager : MonoBehaviour
 
     void EnsureHeartObjects()
     {
-
         while (heartImages.Count < maxHealth)
         {
             Image newHeart = Instantiate(heartImages[0], heartImages[0].transform.parent);
@@ -115,16 +121,37 @@ public class HealthManager : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int amount)
+    public void TakeDamage(int amount, bool bypassInvulnerabilityCheck = false)
+{
+    if (isDead)
+        return;
+
+    PlayerController playerController = GetComponent<PlayerController>();
+
+    // Block outside damage during i-frames,
+    // unless this call is the one that is intentionally applying the hit.
+    if (!bypassInvulnerabilityCheck &&
+        playerController != null &&
+        playerController.IsInvulnerable())
     {
-        health -= amount;
-        health = Mathf.Clamp(health, 0, maxHealth);
-        UpdateHearts();
-        ShowHealthBar();
+        return;
     }
+
+    health -= amount;
+    health = Mathf.Clamp(health, 0, maxHealth);
+
+    UpdateHearts();
+    ShowHealthBar();
+
+    if (health <= 0)
+        Die();
+}
 
     public void Heal(int amount)
     {
+        if (isDead)
+            return;
+
         health += amount;
         health = Mathf.Clamp(health, 0, maxHealth);
         UpdateHearts();
@@ -133,6 +160,9 @@ public class HealthManager : MonoBehaviour
 
     public void AddHeartUpgrade(int amount)
     {
+        if (isDead)
+            return;
+
         for (int i = 0; i < amount; i++)
         {
             if (health < maxHealth)
@@ -152,5 +182,38 @@ public class HealthManager : MonoBehaviour
 
         UpdateHearts();
         ShowHealthBar();
+    }
+
+    private void Die()
+    {
+        if (isDead)
+            return;
+
+        isDead = true;
+
+        PlayerController playerController = GetComponent<PlayerController>();
+        if (playerController != null)
+            playerController.HandleDeath();
+
+        Collider2D playerCollider = GetComponent<Collider2D>();
+        if (playerCollider != null)
+            playerCollider.enabled = false;
+        Shooting shooting = GetComponentInChildren<Shooting>();
+        if (shooting != null)
+            shooting.enabled = false;
+            
+        Rigidbody2D playerRb = GetComponent<Rigidbody2D>();
+        if (playerRb != null)
+            playerRb.linearVelocity = Vector2.zero;
+
+        if (gameOverManager != null)
+            gameOverManager.ShowGameOver();
+        else
+            Time.timeScale = 0f;
+    }
+
+    public bool IsDead()
+    {
+        return isDead;
     }
 }
